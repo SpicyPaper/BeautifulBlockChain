@@ -33,7 +33,9 @@ def commandManager(argument):
     switcher = {
         "-u": createUser,
         "-h": displayHelp,
-        "-i": InitStructFolders
+        "-i": InitStructFolders,
+        "-a": addTransaction,
+        "-d": displayBlockchain
     }
     # Get the function from switcher dictionary
     func = switcher.get(argument, lambda: "*** Invalid command! type : -h for help")
@@ -104,6 +106,8 @@ def displayHelp():
     -h : display this page
     -u : create a new user
     -i : initialize the base structure of the block chain (create usefull folders and files)
+    -a : add a transaction to the blockchain
+    -d : display the blockchain
 
     --force : used in some command to force an action
     """
@@ -121,8 +125,15 @@ def displayTitle():
      | _ )| _ )((/ __|
      | _ \| _ \ | (__
      |___/|___/  \___|
-"""
+     """
 
+def addTransaction(user1, user2, content):
+    # TODO encode the transaction into a string
+    transaction = content
+    Blockchain().add_transaction(transaction)
+
+def displayBlockchain():
+    print(BlockChain())
 
 if __name__ == "__main__":
 

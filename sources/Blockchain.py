@@ -12,13 +12,16 @@ class Blockchain:
             self.blocks = [genesis_block]
             self.transactions = []
 
-            # with open("../bbc/../bbc/blockchain.txt", "w") as f:
-            #     f.write("/**********************************BlockChain**********************************\\\n")
-            #     f.write(self.blocks[-1].__str__())
+            with open("../bbc/blockchain.txt", "w") as f:
+                f.write("/**********************************BlockChain**********************************\\\n")
+                f.write(self.blocks[-1].__str__())
 
 
 
     def __str__(self):
+        """
+        return a string version of the blockchain
+        """
         string = ""
         string += "/**********************************BlockChain**********************************\\\n"
 
@@ -37,11 +40,34 @@ class Blockchain:
         return string
 
     def add_transaction(self, transaction):
+        """
+        add a transaction to the BlockChain
+        read the text file to figure out if we now have 4 transaction and if so, it delete them and creates a new block with them
+        if there is less than 4 transactions in total, it just append this one to the text file
+        """
         self.transactions.append(transaction)
 
         if len(self.transactions) >= 4:
+            blockchain = ""
+            line_index = 0
+            with open("../bbc/blockchain.txt", "r") as f:
+                blockchain = f.readlines()
+                while line_index < len(blockchain):
+                    if "/**********************************BlockChain**********************************\\" in blockchain[line_index]:
+                        line_index += 10
+                    elif "/**************Block" in blockchain[line_index]:
+                        line_index += 12
+                    else :
+                        break
+            with open("../bbc/blockchain.txt", "w") as f:
+                for i in range(line_index):
+                    f.write(blockchain[i])
 
             self.mining_block()
+        else :
+            with open("../bbc/blockchain.txt", "a") as f:
+                f.write(transaction + "\n")
+
 
     def mining_block(self):
         prev_hash = self.blocks[-1].get_hash()
@@ -65,47 +91,36 @@ class Blockchain:
         try:
             file = open("../bbc/blockchain.txt", "r")
 
-            line = file.readline()
-            line = file.readline()
-            while line:
-                if "/**************Block" in line:
-                    print(self.transactions)
+            blockchain = file.readlines()
+            line_index = 1
 
+            while line_index < len(blockchain):
+                if "/**************Block 0" in blockchain[line_index]:
                     new_block = Block()
-                    print("title line : " + line)
-                    line = file.readline()
-                    print("next line : " + line)
-                    new_block.header = line.replace("\n", "")
-                    print("header : " + new_block.header)
-
-                    file.readline()
-                    line = file.readline()
-                    block_transactions = []
-
-                    while line != "-----------------------------------\n":
-                        block_transaction = line.replace("\n", "")
-                        block_transactions.append(block_transaction)
-                        line = file.readline()
-                    new_block.transactions = block_transactions
-                    print(new_block.transactions)
-
-                    line = file.readline()
-                    new_block.nonce = line.replace("\n", "")
-
-                    file.readline()
-                    line = file.readline()
-                    new_block.hash = line.replace("\n", "")
-                    # print(new_block.hash)
-
+                    new_block.header = blockchain[line_index+1].replace("\n", "")
+                    new_block.transactions = [blockchain[line_index+3].replace("\n", "")]
+                    new_block.nonce = blockchain[line_index+5].replace("\n", "")
+                    new_block.hash = blockchain[line_index+7].replace("\n", "")
                     self.blocks.append(new_block)
-
-                    line = file.readline()
-                    # print(line)
+                    line_index += 9
+                elif "/**************Block" in blockchain[line_index]:
+                    new_block = Block()
+                    new_block.header = blockchain[line_index+1].replace("\n", "")
+                    new_block.transactions = []
+                    new_block.transactions.append(blockchain[line_index+3].replace("\n", ""))
+                    new_block.transactions.append(blockchain[line_index+4].replace("\n", ""))
+                    new_block.transactions.append(blockchain[line_index+5].replace("\n", ""))
+                    new_block.transactions.append(blockchain[line_index+6].replace("\n", ""))
+                    new_block.nonce = blockchain[line_index+8].replace("\n", "")
+                    new_block.hash = blockchain[line_index + 10].replace("\n", "")
+                    self.blocks.append(new_block)
+                    line_index += 12
                 else:
-                    line = file.readline()
-                    transaction = file.readline().replace("\n", "")
+                    transaction = blockchain[line_index].replace("\n", "")
                     self.transactions.append(transaction)
-            file.close()
+                    line_index += 1
+
+                file.close()
 
         except Exception as e:
             print(e)
@@ -115,7 +130,6 @@ class Blockchain:
 
 if __name__ == "__main__":
     blockchain = Blockchain()
-
     # blockchain.add_transaction("transaction 1")
     # blockchain.add_transaction("transaction 2")
     # blockchain.add_transaction("transaction 3")
@@ -125,6 +139,8 @@ if __name__ == "__main__":
     # blockchain.add_transaction("transaction 7")
     # blockchain.add_transaction("transaction 8")
     # blockchain.add_transaction("transaction 9")
-    # blockchain.add_transaction("transaction 10")
+    blockchain.add_transaction("transaction XXX")
+
     print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    
     print(blockchain)
