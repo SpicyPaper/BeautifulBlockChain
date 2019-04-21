@@ -1,6 +1,7 @@
-from Cryptodome.PublicKey import RSA
-from Cryptodome.Hash import SHA256
 from Cryptodome import Random
+from Cryptodome.Hash import SHA256
+from Cryptodome.PublicKey import RSA
+
 
 def generate_keys():
     """

@@ -1,5 +1,7 @@
-from Block import Block
 import os
+
+from Block import Block
+
 
 class Blockchain:
 
