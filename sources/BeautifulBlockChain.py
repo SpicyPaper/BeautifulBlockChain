@@ -14,7 +14,28 @@ class BeautifulBlockChain:
         self.extra = ""
         self.command_force = "--force"
 
-    def init_struct_folders(self):
+    def command_manager(self, argument, extra):
+        """
+        Manage all the command enter by the user
+        """
+        self.extra = extra
+        # Switcher is a dict with key = command, value = function to call
+        switcher = {
+            "-u": self._create_user,
+            "-h": self._display_help,
+            "-i": self._init_struct_folders,
+            "-t": self._add_transaction,
+            "-d": self._display_blockchain
+        }
+        # Get the function from switcher dictionary
+        func = switcher.get(argument, lambda: "*** Invalid command! type : -h for help")
+        # Execute the function and print the result
+        res = func()
+        if res != None:
+            print(self._display_title())
+            print(res)
+
+    def _init_struct_folders(self):
         """
         Create the base folders structure for the block chain to work fine
         """
@@ -31,27 +52,7 @@ class BeautifulBlockChain:
         else:
             print("Directory ", self.blockChainPath, " already exists")
 
-    def command_manager(self, argument, extra):
-        """
-        Manage all the command enter by the user
-        """
-        self.extra = extra
-        # Switcher is a dict with key = command, value = function to call
-        switcher = {
-            "-u": self.create_user,
-            "-h": self.display_help,
-            "-i": self.init_struct_folders,
-            "-t": self.add_transaction,
-            "-d": self.display_blockchain
-        }
-        # Get the function from switcher dictionary
-        func = switcher.get(argument, lambda: "*** Invalid command! type : -h for help")
-        # Execute the function and print the result
-        res = func()
-        if res != None:
-            print(res)
-
-    def create_user(self):
+    def _create_user(self):
         """
         Create a new user if he doesn't already exists.
         Create the folder, private and public key.
@@ -94,7 +95,7 @@ class BeautifulBlockChain:
         except Exception as e:
             return "*** An error occured during user creation! " + str(e)
 
-    def add_transaction(self):
+    def _add_transaction(self):
         """
         Make a new transaction between 2 users.
         Add the transaction when enough of them were done.
@@ -107,45 +108,46 @@ class BeautifulBlockChain:
         blockchain = Blockchain()
         blockchain.add_transaction(transaction)
 
-    def display_blockchain(self):
+    def _display_blockchain(self):
         """
         Display the blockchain.
         """
         blockchain = Blockchain()
         print(blockchain)
 
-    def check_user_exists(self, user):
-        if os.path.exists(newUserPath):
-            pass
+    def _check_user_exists(self, userName):
+        userPath = os.path.join(self.usersPath, userName)
+        if not os.path.exists(userPath):
+            print("The user {} doesn't exists, create it to make transaction with it or add --force to this command to create all the needed users!".format(userName))
             
-    def display_help(self):
+    def _display_help(self):
         """
         Returns the help page
         """
 
         helpText = """
-            Welcome in the BeautifulBlockChain help part.
+        Welcome in the BeautifulBlockChain help part.
 
-            ------ How To Use ------
+        ------ How To Use ------
 
-            To use one of this command call this python script following with one of this command, example :
-            ./BeautifulBlockChain.py -h
+        To use one of this command call this python script following with one of this command, example :
+        ./BeautifulBlockChain.py -h
 
-            *** WARNING *** Don't forget to initialize the block chain by doing ./BeautifulBlockChain.py -i
+        *** WARNING *** Don't forget to initialize the block chain by doing ./BeautifulBlockChain.py -i
 
-            ------ Commands ------
+        ------ Commands ------
 
-            -h : display this page
-            -u : create a new user
-            -i : initialize the base structure of the block chain (create usefull folders and files)
-            -t : make a transaction between 2 user and add it to the blockchain when enough transactions were done
-            -d : display the blockchain
+        -h : display this page
+        -u : create a new user
+        -i : initialize the base structure of the block chain (create usefull folders and files)
+        -t : make a transaction between 2 user and add it to the blockchain when enough transactions were done
+        -d : display the blockchain
 
-            --force : used in some command to force an action
+        --force : used in some command to force an action
         """
         return helpText
 
-    def display_title(self):
+    def _display_title(self):
         """
         Returns the title
         """

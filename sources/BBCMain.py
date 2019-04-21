@@ -6,8 +6,6 @@ if __name__ == "__main__":
 
     bbc = BeautifulBlockChain()
 
-    print(bbc.display_title())
-
     try:
         extra = sys.argv[2]
     except:
