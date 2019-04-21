@@ -1,8 +1,11 @@
 from Block import Block
+import os
 
 class Blockchain:
 
     def __init__(self):
+        self.rootPath = "bbc_data"
+        self.blockchainPath = os.path.join("..", self.rootPath, "blockchain.txt")
         try:
             self.load_blockchain()
         except Exception as e:
@@ -12,7 +15,7 @@ class Blockchain:
             self.blocks = [genesis_block]
             self.transactions = []
 
-            with open("../bbc/blockchain.txt", "w") as f:
+            with open(self.blockchainPath, "w") as f:
                 f.write("/**********************************BlockChain**********************************\\\n")
                 f.write(self.blocks[-1].__str__())
 
@@ -50,7 +53,7 @@ class Blockchain:
         if len(self.transactions) >= 4:
             blockchain = ""
             line_index = 0
-            with open("../bbc/blockchain.txt", "r") as f:
+            with open(self.blockchainPath, "r") as f:
                 blockchain = f.readlines()
                 while line_index < len(blockchain):
                     if "/**********************************BlockChain**********************************\\" in blockchain[line_index]:
@@ -59,13 +62,13 @@ class Blockchain:
                         line_index += 12
                     else :
                         break
-            with open("../bbc/blockchain.txt", "w") as f:
+            with open(self.blockchainPath, "w") as f:
                 for i in range(line_index):
                     f.write(blockchain[i])
 
             self.mining_block()
         else :
-            with open("../bbc/blockchain.txt", "a") as f:
+            with open(self.blockchainPath, "a") as f:
                 f.write(transaction + "\n")
 
 
@@ -80,7 +83,7 @@ class Blockchain:
     def add_block(self, block):
         self.blocks.append(block)
 
-        with open("../bbc/blockchain.txt", "a") as f:
+        with open(self.blockchainPath, "a") as f:
             f.write(self.blocks[-1].__str__())
 
 
@@ -89,7 +92,7 @@ class Blockchain:
         self.transactions = []
 
         try:
-            file = open("../bbc/blockchain.txt", "r")
+            file = open(self.blockchainPath, "r")
 
             blockchain = file.readlines()
             line_index = 1

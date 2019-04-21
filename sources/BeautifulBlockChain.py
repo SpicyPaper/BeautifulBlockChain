@@ -1,4 +1,5 @@
 from User import User
+from Blockchain import Blockchain
 import sys
 import os
 
@@ -130,10 +131,12 @@ def displayTitle():
 def addTransaction(user1, user2, content):
     # TODO encode the transaction into a string
     transaction = content
-    Blockchain().add_transaction(transaction)
+    blockchain = Blockchain()
+    blockchain.add_transaction(transaction)
 
 def displayBlockchain():
-    print(BlockChain())
+    blockchain = Blockchain()
+    print(blockchain)
 
 if __name__ == "__main__":
 
@@ -141,6 +144,7 @@ if __name__ == "__main__":
 
     try:
         command = sys.argv[1]
+        commandManager(command)
     except:
         commandManager("-h")
 
@@ -148,5 +152,3 @@ if __name__ == "__main__":
         extra = sys.argv[2]
     except:
         pass
-
-    commandManager(command)
