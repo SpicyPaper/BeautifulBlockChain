@@ -10,7 +10,7 @@ blockChainPath = os.path.join(rootPath, "block_chain")
 extra = ""
 command_force = "--force"
 
-def InitStructFolders():
+def init_struct_folders():
     """
     Create the base folders structure for the block chain to work fine
     """
@@ -27,17 +27,17 @@ def InitStructFolders():
     else:
         print("Directory ", blockChainPath, " already exists")
 
-def commandManager(argument):
+def command_manager(argument):
     """
     Manage all the command enter by the user
     """
     # Switcher is a dict with key = command, value = function to call
     switcher = {
-        "-u": createUser,
-        "-h": displayHelp,
-        "-i": InitStructFolders,
-        "-a": addTransaction,
-        "-d": displayBlockchain
+        "-u": create_user,
+        "-h": display_help,
+        "-i": init_struct_folders,
+        "-t": add_transaction,
+        "-d": display_blockchain
     }
     # Get the function from switcher dictionary
     func = switcher.get(argument, lambda: "*** Invalid command! type : -h for help")
@@ -46,7 +46,7 @@ def commandManager(argument):
     if res != None:
         print(res)
 
-def createUser():
+def create_user():
     """
     Create a new user if he doesn't already exists.
     Create the folder, private and public key.
@@ -89,7 +89,7 @@ def createUser():
     except Exception as e:
         return "*** An error occured during user creation! " + str(e)
 
-def displayHelp():
+def display_help():
     """
     Returns the help page
     """
@@ -108,14 +108,14 @@ def displayHelp():
     -h : display this page
     -u : create a new user
     -i : initialize the base structure of the block chain (create usefull folders and files)
-    -a : add a transaction to the blockchain
+    -t : make a transaction between 2 user and add it to the blockchain when enough transactions were done
     -d : display the blockchain
 
     --force : used in some command to force an action
     """
     return helpText
 
-def displayTitle():
+def display_title():
     """
     Returns the title
     """
@@ -129,8 +129,11 @@ def displayTitle():
      |___/|___/  \___|
      """
 
-def addTransaction():
-    # TODO encode the transaction into a string
+def add_transaction():
+    """
+    Make a new transaction between 2 users.
+    Add the transaction when enough of them were done.
+    """
     user1 = input("Enter the sender user : ")
     user2 = input("Enter the reciever user : ")
     content = input("Enter the transaction content : ")
@@ -139,21 +142,24 @@ def addTransaction():
     blockchain = Blockchain()
     blockchain.add_transaction(transaction)
 
-def displayBlockchain():
+def display_blockchain():
+    """
+    Display the blockchain.
+    """
     blockchain = Blockchain()
     print(blockchain)
 
 if __name__ == "__main__":
 
-    print(displayTitle())
-
-    try:
-        command = sys.argv[1]
-        commandManager(command)
-    except:
-        commandManager("-h")
+    print(display_title())
 
     try:
         extra = sys.argv[2]
     except:
         pass
+
+    try:
+        command = sys.argv[1]
+        command_manager(command)
+    except:
+        command_manager("-h")
