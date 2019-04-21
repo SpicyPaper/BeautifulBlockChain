@@ -4,12 +4,14 @@ import os
 class Blockchain:
 
     def __init__(self):
-        self.rootPath = "bbc_data"
-        self.blockchainPath = os.path.join("..", self.rootPath, "blockchain.txt")
+        rootName = "bbc_data"
+        rootPath = os.path.join("..", rootName, "block_chain")
+        self.blockchainPath = os.path.join(rootPath, "blockchain.txt")
+        print(self.blockchainPath)
+
         try:
             self.load_blockchain()
         except Exception as e:
-            print(e)
             genesis_block = Block(0, ["genesis block"])
             genesis_block.validate("no nonce")
             self.blocks = [genesis_block]
@@ -18,7 +20,6 @@ class Blockchain:
             with open(self.blockchainPath, "w") as f:
                 f.write("/**********************************BlockChain**********************************\\\n")
                 f.write(self.blocks[-1].__str__())
-
 
 
     def __str__(self):
@@ -41,6 +42,7 @@ class Blockchain:
         string += "\******************************************************************************/\n"
 
         return string
+
 
     def add_transaction(self, transaction):
         """

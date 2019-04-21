@@ -3,7 +3,8 @@ from Blockchain import Blockchain
 import sys
 import os
 
-rootPath = "bbc_data"
+rootName = "bbc_data"
+rootPath = os.path.join("..", "bbc_data")
 usersPath = os.path.join(rootPath, "users")
 blockChainPath = os.path.join(rootPath, "block_chain")
 extra = ""
@@ -120,7 +121,7 @@ def displayTitle():
     """
     return """
        (    (     (
-     ( )\ ( )\    )\
+     ( )\ ( )\    )\\
      )((_))((_) (((_)
     ((_)_((_)_  )\___
      | _ )| _ )((/ __|
@@ -128,8 +129,12 @@ def displayTitle():
      |___/|___/  \___|
      """
 
-def addTransaction(user1, user2, content):
+def addTransaction():
     # TODO encode the transaction into a string
+    user1 = input("Enter the sender user : ")
+    user2 = input("Enter the reciever user : ")
+    content = input("Enter the transaction content : ")
+
     transaction = content
     blockchain = Blockchain()
     blockchain.add_transaction(transaction)

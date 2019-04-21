@@ -123,4 +123,4 @@ dmypy.json
 .pyre/
 
 # Ignore Data folder and files
-data/
+bbc_data/
