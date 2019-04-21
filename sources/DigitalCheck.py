@@ -12,10 +12,19 @@ def generate_keys():
     return (key.exportKey(), key.publickey().exportKey())
 
 def generate_hash(data):
+    """
+    Generate the hash for a given data
+    """
     return SHA256.new(data).digest()
 
 def generate_signature(hash, key):
+    """
+    Generate the signature for a given hash and private key
+    """
     return key.sign(hash, '')
 
 def verify_signature(hash, public_key, signature):
+    """
+    Verify if a given signature is valid for a given public_key and hash
+    """
     return public_key.verify(hash, signature)

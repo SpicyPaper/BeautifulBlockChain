@@ -63,7 +63,9 @@ class BeautifulBlockChain:
         try:
             if username == None:
                 username = input("Enter the username : ")
-                user = User()
+            
+            user = User()
+            user.generate_keys()
 
             # Create user path
             newUserPath = os.path.join(self.usersPath, username)
@@ -77,23 +79,23 @@ class BeautifulBlockChain:
                     print("User already exists! Add --force to overwrite the user!")
 
             # Write private and public key in user files
-            privateKeyFile = os.path.join(newUserPath, "private_k")
-            publicKeyFile = os.path.join(newUserPath, "public_k")
+            privateKeyFile = os.path.join(newUserPath, "private_k.pem")
+            publicKeyFile = os.path.join(newUserPath, "public_k.pem")
 
             exists = os.path.isfile(privateKeyFile)
             if exists and self.extra != self.command_force:
                 print("User private key already exists!")
             else:
-                f = open(privateKeyFile, "w+")
-                f.write(user.private_k_utf8())
+                f = open(privateKeyFile, "wb+")
+                f.write(user.private_k_bytes())
                 f.close()
 
             exists = os.path.isfile(publicKeyFile)
             if exists and self.extra != self.command_force:
                 print("User public key already exists!")
             else:
-                f = open(publicKeyFile, "w+")
-                f.write(user.public_k_utf8())
+                f = open(publicKeyFile, "wb+")
+                f.write(user.public_k_bytes())
                 f.close()
             return "*** User created successfully!"
         except Exception as e:
@@ -104,12 +106,13 @@ class BeautifulBlockChain:
         Make a new transaction between 2 users.
         Add the transaction when enough of them were done.
         """
-        user1 = input("Enter the sender user : ")
-        user2 = input("Enter the reciever user : ")
+        username1 = input("Enter the sender user : ")
+        username2 = input("Enter the reciever user : ")
         content = input("Enter the transaction content : ")
 
-        if self._check_user_exists(user1) and self._check_user_exists(user2):
-            pass
+        if self._check_user_exists(username1) and self._check_user_exists(username2):
+            user1 = User()
+            user1.set_user_info(os.path.join(self.usersPath, username1))
 
         transaction = content
         blockchain = Blockchain()
