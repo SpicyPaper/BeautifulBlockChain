@@ -17,8 +17,12 @@ class BeautifulBlockChain:
     def command_manager(self, argument, extra):
         """
         Manage all the command enter by the user
+
+        argument : the argument that references a method
+        extra : for extra arguments, used in some command
         """
         self.extra = extra
+        print(self._display_title())
         # Switcher is a dict with key = command, value = function to call
         switcher = {
             "-u": self._create_user,
@@ -32,7 +36,6 @@ class BeautifulBlockChain:
         # Execute the function and print the result
         res = func()
         if res != None:
-            print(self._display_title())
             print(res)
 
     def _init_struct_folders(self):
@@ -52,14 +55,15 @@ class BeautifulBlockChain:
         else:
             print("Directory ", self.blockChainPath, " already exists")
 
-    def _create_user(self):
+    def _create_user(self, username = None):
         """
         Create a new user if he doesn't already exists.
         Create the folder, private and public key.
         """
         try:
-            username = input("Enter the username : ")
-            user = User()
+            if username == None:
+                username = input("Enter the username : ")
+                user = User()
 
             # Create user path
             newUserPath = os.path.join(self.usersPath, username)
@@ -104,9 +108,33 @@ class BeautifulBlockChain:
         user2 = input("Enter the reciever user : ")
         content = input("Enter the transaction content : ")
 
+        if self._check_user_exists(user1) and self._check_user_exists(user2):
+            pass
+
         transaction = content
         blockchain = Blockchain()
         blockchain.add_transaction(transaction)
+
+    def _check_user_exists(self, username):
+        """
+        Check if a user already exists.
+        Create the user if the --force is used.
+        """
+        userPath = os.path.join(self.usersPath, username)
+
+        if not os.path.exists(userPath):
+
+            if self.extra == self.command_force:
+                print("The user {} was created because you add --force".format(username))
+                self._create_user(username)
+
+                return True
+            else:
+                print("The user {} doesn't exists, create it to make transaction with it or add --force to this command to create all the needed users!".format(username))
+        else:
+            return True
+
+        return False
 
     def _display_blockchain(self):
         """
@@ -114,11 +142,6 @@ class BeautifulBlockChain:
         """
         blockchain = Blockchain()
         print(blockchain)
-
-    def _check_user_exists(self, userName):
-        userPath = os.path.join(self.usersPath, userName)
-        if not os.path.exists(userPath):
-            print("The user {} doesn't exists, create it to make transaction with it or add --force to this command to create all the needed users!".format(userName))
             
     def _display_help(self):
         """
