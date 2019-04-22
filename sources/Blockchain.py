@@ -22,6 +22,7 @@ class Blockchain:
             with open(self.blockchainPath, "w") as f:
                 f.write("/**********************************BlockChain**********************************\\\n")
                 f.write(self.blocks[-1].__str__())
+                f.write("\n")
                 f.write("/**************waiting transactions***************\\\n")
 
 
@@ -34,6 +35,7 @@ class Blockchain:
 
         for block in self.blocks:
             string += block.__str__()
+            string += "\n"
             string += "\n"
 
         string += "/**************waiting transactions***************\\\n"
@@ -63,9 +65,9 @@ class Blockchain:
                 blockchain = f.readlines()
                 while line_index < len(blockchain):
                     if "/**********************************BlockChain**********************************\\" in blockchain[line_index]:
-                        line_index += 11
+                        line_index += 12
                     elif "/**************Block" in blockchain[line_index]:
-                        line_index += 13
+                        line_index += 14
                     else :
                         break
             with open(self.blockchainPath, "w") as f:
@@ -91,6 +93,7 @@ class Blockchain:
 
         with open(self.blockchainPath, "a") as f:
             f.write(self.blocks[-1].__str__())
+            f.write("\n")
             f.write("/**************waiting transactions***************\\\n")
 
 
@@ -114,7 +117,7 @@ class Blockchain:
                     new_block.transactions = [blockchain[line_index+6].replace("\n", "")]
                     new_block.hash = blockchain[line_index+8].replace("\n", "")
                     self.blocks.append(new_block)
-                    line_index += 10
+                    line_index += 11
                 elif "/**************Block" in blockchain[line_index]:
                     new_block = Block()
                     new_block.prev_hash = blockchain[line_index+1].replace("\n", "")
@@ -128,7 +131,7 @@ class Blockchain:
                     new_block.transactions.append(blockchain[line_index+9].replace("\n", ""))
                     new_block.hash = blockchain[line_index + 11].replace("\n", "")
                     self.blocks.append(new_block)
-                    line_index += 13
+                    line_index += 14
                 elif "/**************waiting transactions***************\\" in blockchain[line_index]:
                     line_index += 1
                 else:
@@ -155,7 +158,5 @@ if __name__ == "__main__":
     # blockchain.add_transaction("transaction 8")
     # blockchain.add_transaction("transaction 9")
     # blockchain.add_transaction("transaction XXX")
-
-    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 
     print(blockchain)
