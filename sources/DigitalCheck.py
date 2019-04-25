@@ -1,6 +1,7 @@
 from Cryptodome import Random
 from Cryptodome.Hash import SHA256
 from Cryptodome.PublicKey import RSA
+from Cryptodome.Signature import pkcs1_15
 
 
 def generate_keys():
@@ -15,16 +16,30 @@ def generate_hash(data):
     """
     Generate the hash for a given data
     """
-    return SHA256.new(data).digest()
+    return SHA256.new(data)
 
-def generate_signature(hash, key):
+def generate_signature(h, key):
     """
     Generate the signature for a given hash and private key
     """
-    return key.sign(hash, '')
+    return pkcs1_15.new(key).sign(h)
 
-def verify_signature(hash, public_key, signature):
+def import_key(key_file_path):
+    """
+    Import a key to RSA from a file
+    """
+    with open(key_file_path, "r") as keyfile:
+        return RSA.import_key(keyfile.read())
+
+def import_key_bytes(key_bytes):
+    return RSA.import_key(key_bytes)
+
+def verify_signature(h, public_key, signature):
     """
     Verify if a given signature is valid for a given public_key and hash
     """
-    return public_key.verify(hash, signature)
+    try:
+        pkcs1_15.new(public_key).verify(h, signature)
+        return True
+    except:
+        return False

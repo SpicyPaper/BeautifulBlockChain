@@ -1,3 +1,4 @@
+import base64
 import os
 
 from DigitalCheck import *
@@ -34,21 +35,16 @@ class User:
         """
         path, file = os.path.split(user_path)
         self.username = file
-        self.private_k = self._import_key(os.path.join(user_path, "private_k.pem"))
-        self.public_k = self._import_key(os.path.join(user_path, "public_k.pem"))
-        print(self.private_k_bytes(), self.public_k_bytes())
+        self.private_k = import_key(os.path.join(user_path, "private_k.pem"))
+        self.public_k = import_key(os.path.join(user_path, "public_k.pem"))
 
-    def sign_transaction(self):
-        pass
+    def sign_transaction(self, data):
+        data = bytes(data, 'utf-8')
+        data_hash = generate_hash(data)
+        data_sign = generate_signature(data_hash, self.private_k)
+        return data_sign, data_hash
 
     def display_keys(self):
         print(self.private_k_utf8())
         print("\n\n")
         print(self.public_k_utf8())
-
-    def _import_key(self, key_file_path):
-        """
-        Import a key to RSA from a file
-        """
-        with open(key_file_path, "r") as keyfile:
-            return RSA.import_key(keyfile.read())

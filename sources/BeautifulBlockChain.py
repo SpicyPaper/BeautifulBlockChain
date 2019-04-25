@@ -1,7 +1,9 @@
+import base64
 import os
 
 from Blockchain import Blockchain
 from User import User
+from DigitalCheck import *
 
 
 class BeautifulBlockChain:
@@ -13,6 +15,8 @@ class BeautifulBlockChain:
         self.blockChainPath = os.path.join(rootPath, "block_chain")
         self.extra = ""
         self.command_force = "--force"
+        self.part_splitter = ";"
+        self.type_splitter = "!\n"
 
     def command_manager(self, argument, extra):
         """
@@ -61,6 +65,7 @@ class BeautifulBlockChain:
         Create the folder, private and public key.
         """
         try:
+            isAllOpStandard = True
             if username == None:
                 username = input("Enter the username : ")
             
@@ -73,6 +78,8 @@ class BeautifulBlockChain:
             if not os.path.exists(newUserPath):
                 os.makedirs(newUserPath)
             else:
+                isAllOpStandard = False
+
                 if self.extra == self.command_force:
                     print("User was overwrite!")
                 else:
@@ -84,6 +91,7 @@ class BeautifulBlockChain:
 
             exists = os.path.isfile(privateKeyFile)
             if exists and self.extra != self.command_force:
+                isAllOpStandard = False
                 print("User private key already exists!")
             else:
                 f = open(privateKeyFile, "wb+")
@@ -92,12 +100,17 @@ class BeautifulBlockChain:
 
             exists = os.path.isfile(publicKeyFile)
             if exists and self.extra != self.command_force:
+                isAllOpStandard = False
                 print("User public key already exists!")
             else:
                 f = open(publicKeyFile, "wb+")
                 f.write(user.public_k_bytes())
                 f.close()
-            return "*** User created successfully!"
+            
+            if isAllOpStandard:
+                return "*** User created successfully!"
+            else:
+                return ""
         except Exception as e:
             return "*** An error occured during user creation! " + str(e)
 
@@ -106,17 +119,57 @@ class BeautifulBlockChain:
         Make a new transaction between 2 users.
         Add the transaction when enough of them were done.
         """
+        # Get users info
         username1 = input("Enter the sender user : ")
         username2 = input("Enter the reciever user : ")
         content = input("Enter the transaction content : ")
 
+        # Check if both users exists
         if self._check_user_exists(username1) and self._check_user_exists(username2):
-            user1 = User()
-            user1.set_user_info(os.path.join(self.usersPath, username1))
+            # Create both users
+            sender = User()
+            sender.set_user_info(os.path.join(self.usersPath, username1))
 
-        transaction = content
-        blockchain = Blockchain()
-        blockchain.add_transaction(transaction)
+            reciever = User()
+            reciever.set_user_info(os.path.join(self.usersPath, username2))
+
+            # Create signature
+            sender_sign, sender_hash = sender.sign_transaction(content)
+            sender_sign_enc = self._enc_sign_b64(sender_sign)
+
+            # Prepare transaction
+            enc_transaction = str(sender.public_k_bytes()) + self.part_splitter + str(reciever.public_k_bytes()) + self.part_splitter + content + self.part_splitter + sender_sign_enc
+            clear_transaction = username1 + self.part_splitter + username2 + self.part_splitter + content + self.part_splitter + sender_sign_enc
+
+            # Create transaction
+            transaction = str(base64.b64encode(bytes(enc_transaction, 'utf-8'))) + self.type_splitter + clear_transaction
+            self.extra = transaction
+            self._verify_transaction()
+            blockchain = Blockchain()
+            blockchain.add_transaction(transaction)
+
+    def _verify_transaction(self):
+        transaction = self.extra
+        transaction = transaction.split(self.type_splitter)[0]
+        transaction = base64.b64decode(eval(transaction)).decode('utf-8')
+        transaction = transaction.split(self.part_splitter)
+
+        content = bytes(transaction[2], 'utf-8')
+        public_k = import_key_bytes(eval(transaction[0]))
+        signature = self._dec_sign_b64(transaction[3])
+
+        h = generate_hash(content)
+
+        if verify_signature(h, public_k, signature):
+            print("The signature is valid!")
+        else:
+            print("The signature is NOT valid!")
+
+    def _enc_sign_b64(self, sign):
+        return str(base64.b64encode(sign))
+
+    def _dec_sign_b64(self, enc_sign):
+        return bytes(base64.b64decode(eval(enc_sign)))
 
     def _check_user_exists(self, username):
         """
