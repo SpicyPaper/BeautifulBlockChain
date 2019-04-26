@@ -33,6 +33,7 @@ class BeautifulBlockChain:
             "-h": self._display_help,
             "-i": self._init_struct_folders,
             "-t": self._add_transaction,
+            "-v": self._verify_transaction,
             "-d": self._display_blockchain
         }
         # Get the function from switcher dictionary
@@ -116,8 +117,7 @@ class BeautifulBlockChain:
 
     def _add_transaction(self):
         """
-        Make a new transaction between 2 users.
-        Add the transaction when enough of them were done.
+        Make a new transaction between 2 users and add it to the blockchain.
         """
         # Get users info
         username1 = input("Enter the sender user : ")
@@ -141,18 +141,20 @@ class BeautifulBlockChain:
 
             # Prepare transaction
             data_transaction = str(sender.public_k_bytes()) + self.part_splitter + str(reciever.public_k_bytes()) + self.part_splitter + content + self.part_splitter + sender_sign_enc
-            #data_transaction = username1 + self.part_splitter + username2 + self.part_splitter + content + self.part_splitter + sender_sign_enc
+            # data_transaction = username1 + self.part_splitter + username2 + self.part_splitter + content + self.part_splitter + sender_sign_enc
 
             # Create transaction
             transaction = str(base64.b64encode(bytes(data_transaction, 'utf-8'))) + self.type_splitter + data_transaction
-            self.extra = transaction
-            self._verify_transaction()
             blockchain = Blockchain()
             blockchain.add_transaction(transaction)
 
     def _verify_transaction(self):
+        """
+        Verify if a transaction encoded in base64 is valid.
+        Check signature with given information in the transaction.
+        """
         transaction = self.extra
-        transaction = transaction.split(self.type_splitter)[0]
+        # transaction = transaction.split(self.type_splitter)[0]
         transaction = base64.b64decode(eval(transaction)).decode('utf-8')
         transaction = transaction.split(self.part_splitter)
 
@@ -224,6 +226,7 @@ class BeautifulBlockChain:
         -u : create a new user
         -i : initialize the base structure of the block chain (create usefull folders and files)
         -t : make a transaction between 2 user and add it to the blockchain when enough transactions were done
+        -v : verify the transaction given in parameter (put the transaction between quotation marks)
         -d : display the blockchain
 
         --force : used in some command to force an action
