@@ -134,15 +134,17 @@ class BeautifulBlockChain:
             reciever.set_user_info(os.path.join(self.usersPath, username2))
 
             # Create signature
-            sender_sign, sender_hash = sender.sign_transaction(content)
+            content_sign = bytes(content, 'utf-8') + reciever.public_k_bytes()
+            h = generate_hash(content_sign)
+            sender_sign, sender_hash = sender.sign_transaction(h)
             sender_sign_enc = self._enc_sign_b64(sender_sign)
 
             # Prepare transaction
-            enc_transaction = str(sender.public_k_bytes()) + self.part_splitter + str(reciever.public_k_bytes()) + self.part_splitter + content + self.part_splitter + sender_sign_enc
-            clear_transaction = username1 + self.part_splitter + username2 + self.part_splitter + content + self.part_splitter + sender_sign_enc
+            data_transaction = str(sender.public_k_bytes()) + self.part_splitter + str(reciever.public_k_bytes()) + self.part_splitter + content + self.part_splitter + sender_sign_enc
+            #data_transaction = username1 + self.part_splitter + username2 + self.part_splitter + content + self.part_splitter + sender_sign_enc
 
             # Create transaction
-            transaction = str(base64.b64encode(bytes(enc_transaction, 'utf-8'))) + self.type_splitter + clear_transaction
+            transaction = str(base64.b64encode(bytes(data_transaction, 'utf-8'))) + self.type_splitter + data_transaction
             self.extra = transaction
             self._verify_transaction()
             blockchain = Blockchain()
@@ -155,12 +157,14 @@ class BeautifulBlockChain:
         transaction = transaction.split(self.part_splitter)
 
         content = bytes(transaction[2], 'utf-8')
-        public_k = import_key_bytes(eval(transaction[0]))
+        sender_pu_k = import_key_bytes(eval(transaction[0]))
+        reciever_pu_k_bytes = eval(transaction[1])
         signature = self._dec_sign_b64(transaction[3])
+        content_sign = content + reciever_pu_k_bytes
 
-        h = generate_hash(content)
+        h = generate_hash(content_sign)
 
-        if verify_signature(h, public_k, signature):
+        if verify_signature(h, sender_pu_k, signature):
             print("The signature is valid!")
         else:
             print("The signature is NOT valid!")
