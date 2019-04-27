@@ -10,7 +10,7 @@ class BeautifulBlockChain:
 
     def __init__(self):
         rootName = "bbc_data"
-        rootPath = os.path.join("..", rootName)
+        rootPath = os.path.join(rootName)
         self.usersPath = os.path.join(rootPath, "users")
         self.blockChainPath = os.path.join(rootPath, "block_chain")
         self.extra = ""
