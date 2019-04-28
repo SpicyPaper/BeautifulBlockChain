@@ -30,6 +30,7 @@ class Block:
 
         for transaction in self.transactions:
             string += str(transaction) + "\n"
+            #string += "\n"
 
         string += "-----------------------------------\n"
         string += str(self.hash) + "\n"
