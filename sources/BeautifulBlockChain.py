@@ -17,7 +17,7 @@ class BeautifulBlockChain:
         self.command_force = "--force"
         self.part_splitter = ";"
 
-    def command_manager(self, argument, extra):
+    def command_manager(self, argument, extra, displayTitle = True):
         """
         Manage all the command enter by the user
 
@@ -25,7 +25,10 @@ class BeautifulBlockChain:
         extra : for extra arguments, used in some command
         """
         self.extra = extra
-        print(self._display_title())
+
+        if displayTitle:
+            print(self._display_title())
+
         # Switcher is a dict with key = command, value = function to call
         switcher = {
             "-u": self._create_user,
@@ -49,15 +52,15 @@ class BeautifulBlockChain:
         # Create target Directory if don't exist
         if not os.path.exists(self.usersPath):
             os.makedirs(self.usersPath)
-            print("Directory ", self.usersPath, " Created ")
+            print("*** Directory ", self.usersPath, " Created ")
         else:
-            print("Directory '", self.usersPath, "' already exists")
+            print("*** Directory '", self.usersPath, "' already exists")
 
         if not os.path.exists(self.blockChainPath):
             os.makedirs(self.blockChainPath)
-            print("Directory ", self.blockChainPath, " Created ")
+            print("*** Directory ", self.blockChainPath, " Created ")
         else:
-            print("Directory ", self.blockChainPath, " already exists")
+            print("*** Directory ", self.blockChainPath, " already exists")
             
         blockchain = Blockchain()
 
@@ -153,21 +156,25 @@ class BeautifulBlockChain:
         Verify if a transaction encoded in base64 is valid.
         Check signature with given information in the transaction.
         """
-        transaction = self.extra
-        transaction = transaction.split(self.part_splitter)
+        try:
+            transaction = self.extra
+            transaction = transaction.split(self.part_splitter)
 
-        content = bytes(transaction[2], 'utf-8')
-        sender_pu_k = import_key_bytes(eval(transaction[0]))
-        reciever_pu_k_bytes = eval(transaction[1])
-        signature = self._dec_sign_b64(transaction[3])
-        content_sign = content + reciever_pu_k_bytes
+            content = bytes(transaction[2], 'utf-8')
+            sender_pu_k = import_key_bytes(eval(transaction[0]))
+            reciever_pu_k_bytes = eval(transaction[1])
+            signature = self._dec_sign_b64(transaction[3])
+            content_sign = content + reciever_pu_k_bytes
 
-        h = generate_hash(content_sign)
+            h = generate_hash(content_sign)
 
-        if verify_signature(h, sender_pu_k, signature):
-            print("The signature is valid!")
-        else:
-            print("The signature is NOT valid!")
+            if verify_signature(h, sender_pu_k, signature):
+                print("*** The transaction is valid!")
+            else:
+                print("*** The transaction is NOT valid!")
+        except Exception as e:
+            print("*** The transaction is NOT valid!")
+            raise(e)
 
     def _enc_sign_b64(self, sign):
         """

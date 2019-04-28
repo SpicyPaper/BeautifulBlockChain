@@ -15,4 +15,5 @@ if __name__ == "__main__":
         command = sys.argv[1]
         bbc.command_manager(command, extra)
     except Exception as e:
-        bbc.command_manager("-h", extra)
+        print(e)
+        bbc.command_manager("-h", extra, False)
