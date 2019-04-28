@@ -35,13 +35,12 @@ class Blockchain:
 
         for block in self.blocks:
             string += block.__str__()
-            string += "\n"
-            string += "\n"
+            string += "\n\n"
 
         string += "/**************waiting transactions***************\\\n"
         for transaction in self.transactions:
             string += transaction
-            string += "\n"
+            string += "\n\n"
 
         string += "\n"
 
@@ -65,9 +64,9 @@ class Blockchain:
                 blockchain = f.readlines()
                 while line_index < len(blockchain):
                     if "/**********************************BlockChain**********************************\\" in blockchain[line_index]:
-                        line_index += 12
-                    elif "/**************Block" in blockchain[line_index]:
                         line_index += 14
+                    elif "/**************Block" in blockchain[line_index]:
+                        line_index += 19
                     else :
                         break
             with open(self.blockchainPath, "w") as f:
@@ -77,7 +76,7 @@ class Blockchain:
             self.mining_block()
         else :
             with open(self.blockchainPath, "a") as f:
-                f.write(transaction + "\n")
+                f.write(transaction + "\n\n")
 
 
     def mining_block(self):
@@ -114,10 +113,10 @@ class Blockchain:
                     new_block.timestamp = blockchain[line_index+2].replace("\n", "")
                     new_block.merkle_root = blockchain[line_index+3].replace("\n", "")
                     new_block.nonce = blockchain[line_index+4].replace("\n", "")
-                    new_block.transactions = [blockchain[line_index+6].replace("\n", "")]
-                    new_block.hash = blockchain[line_index+8].replace("\n", "")
+                    new_block.transactions = [blockchain[line_index+7].replace("\n", "")]
+                    new_block.hash = blockchain[line_index+10].replace("\n", "")
                     self.blocks.append(new_block)
-                    line_index += 11
+                    line_index += 13
                 elif "/**************Block" in blockchain[line_index]:
                     new_block = Block()
                     new_block.prev_hash = blockchain[line_index+1].replace("\n", "")
@@ -125,19 +124,19 @@ class Blockchain:
                     new_block.merkle_root = blockchain[line_index+3].replace("\n", "")
                     new_block.nonce = blockchain[line_index+4].replace("\n", "")
                     new_block.transactions = []
-                    new_block.transactions.append(blockchain[line_index+6].replace("\n", ""))
                     new_block.transactions.append(blockchain[line_index+7].replace("\n", ""))
-                    new_block.transactions.append(blockchain[line_index+8].replace("\n", ""))
                     new_block.transactions.append(blockchain[line_index+9].replace("\n", ""))
-                    new_block.hash = blockchain[line_index + 11].replace("\n", "")
+                    new_block.transactions.append(blockchain[line_index+11].replace("\n", ""))
+                    new_block.transactions.append(blockchain[line_index+13].replace("\n", ""))
+                    new_block.hash = blockchain[line_index+16].replace("\n", "")
                     self.blocks.append(new_block)
-                    line_index += 14
+                    line_index += 19
                 elif "/**************waiting transactions***************\\" in blockchain[line_index]:
                     line_index += 1
                 else:
                     transaction = blockchain[line_index].replace("\n", "")
                     self.transactions.append(transaction)
-                    line_index += 1
+                    line_index += 2
 
                 file.close()
 
