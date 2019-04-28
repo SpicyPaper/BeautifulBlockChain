@@ -70,7 +70,7 @@ class BeautifulBlockChain:
             isAllOpStandard = True
             if username == None:
                 username = input("Enter the username : ")
-            
+
             user = User()
             user.generate_keys()
 
@@ -108,7 +108,7 @@ class BeautifulBlockChain:
                 f = open(publicKeyFile, "wb+")
                 f.write(user.public_k_bytes())
                 f.close()
-            
+
             if isAllOpStandard:
                 return "*** User created successfully!"
             else:
@@ -208,7 +208,7 @@ class BeautifulBlockChain:
         """
         blockchain = Blockchain()
         print(blockchain)
-            
+
     def _display_help(self):
         """
         Returns the help page

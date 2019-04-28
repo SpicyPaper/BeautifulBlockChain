@@ -1,4 +1,6 @@
 import hashlib
+import time
+import datetime
 
 class Block:
 
@@ -8,7 +10,8 @@ class Block:
         self.blockNumber = Block.blockNumber
         Block.blockNumber += 1
         self.prev_hash = prev_hash
-        self.timestamp = 0 # TODO
+        ts = time.time()
+        self.timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         self.merkle_root = None
         #self.difficulty = 0
         self.nonce = None
@@ -26,10 +29,10 @@ class Block:
         string += str(self.timestamp) + "\n"
         string += str(self.merkle_root) + "\n"
         string += str(self.nonce) + "\n"
-        string += "-----------------------------------\n"
+        string += "-----------------------------------\n\n"
 
         for transaction in self.transactions:
-            string += str(transaction) + "\n"
+            string += str(transaction) + "\n\n"
 
         string += "-----------------------------------\n"
         string += str(self.hash) + "\n"
