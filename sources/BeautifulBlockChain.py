@@ -10,7 +10,7 @@ class BeautifulBlockChain:
 
     def __init__(self):
         rootName = "bbc_data"
-        rootPath = os.path.join("..", rootName)
+        rootPath = os.path.join(rootName)
         self.usersPath = os.path.join(rootPath, "users")
         self.blockChainPath = os.path.join(rootPath, "block_chain")
         self.extra = ""
@@ -33,6 +33,7 @@ class BeautifulBlockChain:
             "-h": self._display_help,
             "-i": self._init_struct_folders,
             "-t": self._add_transaction,
+            "-v": self._verify_transaction,
             "-d": self._display_blockchain
         }
         # Get the function from switcher dictionary
@@ -116,8 +117,7 @@ class BeautifulBlockChain:
 
     def _add_transaction(self):
         """
-        Make a new transaction between 2 users.
-        Add the transaction when enough of them were done.
+        Make a new transaction between 2 users and add it to the blockchain.
         """
         # Get users info
         username1 = input("Enter the sender user : ")
@@ -134,33 +134,39 @@ class BeautifulBlockChain:
             reciever.set_user_info(os.path.join(self.usersPath, username2))
 
             # Create signature
-            sender_sign, sender_hash = sender.sign_transaction(content)
+            content_sign = bytes(content, 'utf-8') + reciever.public_k_bytes()
+            h = generate_hash(content_sign)
+            sender_sign, sender_hash = sender.sign_transaction(h)
             sender_sign_enc = self._enc_sign_b64(sender_sign)
 
             # Prepare transaction
-            enc_transaction = str(sender.public_k_bytes()) + self.part_splitter + str(reciever.public_k_bytes()) + self.part_splitter + content + self.part_splitter + sender_sign_enc
-            clear_transaction = username1 + self.part_splitter + username2 + self.part_splitter + content + self.part_splitter + sender_sign_enc
+            data_transaction = str(sender.public_k_bytes()) + self.part_splitter + str(reciever.public_k_bytes()) + self.part_splitter + content + self.part_splitter + sender_sign_enc
+            # data_transaction = username1 + self.part_splitter + username2 + self.part_splitter + content + self.part_splitter + sender_sign_enc
 
             # Create transaction
-            transaction = str(base64.b64encode(bytes(enc_transaction, 'utf-8'))) + self.type_splitter + clear_transaction
-            self.extra = transaction
-            self._verify_transaction()
+            transaction = str(base64.b64encode(bytes(data_transaction, 'utf-8'))) + self.type_splitter + data_transaction
             blockchain = Blockchain()
             blockchain.add_transaction(transaction)
 
     def _verify_transaction(self):
+        """
+        Verify if a transaction encoded in base64 is valid.
+        Check signature with given information in the transaction.
+        """
         transaction = self.extra
-        transaction = transaction.split(self.type_splitter)[0]
+        # transaction = transaction.split(self.type_splitter)[0]
         transaction = base64.b64decode(eval(transaction)).decode('utf-8')
         transaction = transaction.split(self.part_splitter)
 
         content = bytes(transaction[2], 'utf-8')
-        public_k = import_key_bytes(eval(transaction[0]))
+        sender_pu_k = import_key_bytes(eval(transaction[0]))
+        reciever_pu_k_bytes = eval(transaction[1])
         signature = self._dec_sign_b64(transaction[3])
+        content_sign = content + reciever_pu_k_bytes
 
-        h = generate_hash(content)
+        h = generate_hash(content_sign)
 
-        if verify_signature(h, public_k, signature):
+        if verify_signature(h, sender_pu_k, signature):
             print("The signature is valid!")
         else:
             print("The signature is NOT valid!")
@@ -220,6 +226,7 @@ class BeautifulBlockChain:
         -u : create a new user
         -i : initialize the base structure of the block chain (create usefull folders and files)
         -t : make a transaction between 2 user and add it to the blockchain when enough transactions were done
+        -v : verify the transaction given in parameter (put the transaction between quotation marks)
         -d : display the blockchain
 
         --force : used in some command to force an action

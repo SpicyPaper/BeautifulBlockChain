@@ -7,7 +7,7 @@ class Blockchain:
 
     def __init__(self):
         rootName = "bbc_data"
-        rootPath = os.path.join("..", rootName, "block_chain")
+        rootPath = os.path.join(rootName, "block_chain")
         self.blockchainPath = os.path.join(rootPath, "blockchain.txt")
         print(self.blockchainPath)
 

@@ -38,9 +38,7 @@ class User:
         self.private_k = import_key(os.path.join(user_path, "private_k.pem"))
         self.public_k = import_key(os.path.join(user_path, "public_k.pem"))
 
-    def sign_transaction(self, data):
-        data = bytes(data, 'utf-8')
-        data_hash = generate_hash(data)
+    def sign_transaction(self, data_hash):
         data_sign = generate_signature(data_hash, self.private_k)
         return data_sign, data_hash
 
