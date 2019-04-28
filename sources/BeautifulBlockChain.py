@@ -2,8 +2,8 @@ import base64
 import os
 
 from Blockchain import Blockchain
-from User import User
 from DigitalCheck import *
+from User import User
 
 
 class BeautifulBlockChain:
@@ -16,7 +16,6 @@ class BeautifulBlockChain:
         self.extra = ""
         self.command_force = "--force"
         self.part_splitter = ";"
-        self.type_splitter = "!\n"
 
     def command_manager(self, argument, extra):
         """
@@ -143,10 +142,8 @@ class BeautifulBlockChain:
 
             # Prepare transaction
             data_transaction = str(sender.public_k_bytes()) + self.part_splitter + str(reciever.public_k_bytes()) + self.part_splitter + content + self.part_splitter + sender_sign_enc
-            #data_transaction = username1 + self.part_splitter + username2 + self.part_splitter + content + self.part_splitter + sender_sign_enc
 
             # Create transaction
-            #transaction = str(base64.b64encode(bytes(data_transaction, 'utf-8'))) + self.type_splitter + data_transaction
             transaction = data_transaction
             blockchain = Blockchain()
             blockchain.add_transaction(transaction)
@@ -157,8 +154,6 @@ class BeautifulBlockChain:
         Check signature with given information in the transaction.
         """
         transaction = self.extra
-        #transaction = transaction.split(self.type_splitter)[0]
-        #transaction = base64.b64decode(eval(transaction)).decode('utf-8')
         transaction = transaction.split(self.part_splitter)
 
         content = bytes(transaction[2], 'utf-8')
@@ -175,9 +170,15 @@ class BeautifulBlockChain:
             print("The signature is NOT valid!")
 
     def _enc_sign_b64(self, sign):
+        """
+        Encode a given string in a b64 string
+        """
         return str(base64.b64encode(sign))
 
     def _dec_sign_b64(self, enc_sign):
+        """
+        Decode a given b64 string in bytes
+        """
         return bytes(base64.b64decode(eval(enc_sign)))
 
     def _check_user_exists(self, username):
@@ -226,8 +227,8 @@ class BeautifulBlockChain:
         ------ Commands ------
 
         -h : display this page
-        -u : create a new user
         -i : initialize the base structure of the block chain (create usefull folders and files)
+        -u : create a new user
         -t : make a transaction between 2 user and add it to the blockchain when enough transactions were done
         -v : verify the transaction given in parameter (put the transaction between quotation marks)
         -d : display the blockchain
