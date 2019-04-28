@@ -59,6 +59,8 @@ class BeautifulBlockChain:
             print("Directory ", self.blockChainPath, " Created ")
         else:
             print("Directory ", self.blockChainPath, " already exists")
+            
+        blockchain = Blockchain()
 
     def _create_user(self, username = None):
         """
@@ -120,8 +122,8 @@ class BeautifulBlockChain:
         Make a new transaction between 2 users and add it to the blockchain.
         """
         # Get users info
-        username1 = input("Enter the sender user : ")
-        username2 = input("Enter the reciever user : ")
+        username1 = input("Enter the client user : ")
+        username2 = input("Enter the operator user : ")
         content = input("Enter the transaction content : ")
 
         # Check if both users exists
@@ -141,10 +143,11 @@ class BeautifulBlockChain:
 
             # Prepare transaction
             data_transaction = str(sender.public_k_bytes()) + self.part_splitter + str(reciever.public_k_bytes()) + self.part_splitter + content + self.part_splitter + sender_sign_enc
-            # data_transaction = username1 + self.part_splitter + username2 + self.part_splitter + content + self.part_splitter + sender_sign_enc
+            #data_transaction = username1 + self.part_splitter + username2 + self.part_splitter + content + self.part_splitter + sender_sign_enc
 
             # Create transaction
-            transaction = str(base64.b64encode(bytes(data_transaction, 'utf-8'))) + self.type_splitter + data_transaction
+            #transaction = str(base64.b64encode(bytes(data_transaction, 'utf-8'))) + self.type_splitter + data_transaction
+            transaction = data_transaction
             blockchain = Blockchain()
             blockchain.add_transaction(transaction)
 
@@ -154,8 +157,8 @@ class BeautifulBlockChain:
         Check signature with given information in the transaction.
         """
         transaction = self.extra
-        # transaction = transaction.split(self.type_splitter)[0]
-        transaction = base64.b64decode(eval(transaction)).decode('utf-8')
+        #transaction = transaction.split(self.type_splitter)[0]
+        #transaction = base64.b64decode(eval(transaction)).decode('utf-8')
         transaction = transaction.split(self.part_splitter)
 
         content = bytes(transaction[2], 'utf-8')
