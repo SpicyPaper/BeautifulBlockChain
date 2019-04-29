@@ -80,14 +80,21 @@ class Blockchain:
 
 
     def mining_block(self):
+        """
+        use a nonce to validate the blocks (as there is non mining, the nonce is always the same)
+        if we want to implements mining, it would be in this method, searching nonce and trying hash with try_hash method of Block
+        """
         prev_hash = self.blocks[-1].get_hash()
         new_block = Block(prev_hash, self.transactions)
-        new_block.validate("test nonce")
+        new_block.validate("nonce" + str(new_block.blockNumber))
         self.add_block(new_block)
         self.transactions = []
 
 
-    def add_block(self, block):
+    def _add_block(self, block):
+        """
+        append a blcok to the blockchain and rewrite the blockchain in the text file
+        """
         self.blocks.append(block)
 
         with open(self.blockchainPath, "a") as f:
@@ -96,7 +103,10 @@ class Blockchain:
             f.write("/**************waiting transactions***************\\\n")
 
 
-    def load_blockchain(self):
+    def _load_blockchain(self):
+        """
+        read the blockchain from the text file
+        """
         self.blocks = []
         self.transactions = []
 

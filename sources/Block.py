@@ -17,12 +17,14 @@ class Block:
         self.nonce = None
         self.transactions = transactions
         self.hash = None
-        # TODO : total hash = hash du header
         if (self.transactions != None):
             self.compute_merkle_root()
 
 
     def __str__(self):
+        """
+        return a string version of the block
+        """
         string = ""
         string += "/**************Block %d***************\\\n" % self.blockNumber
         string += str(self.prev_hash) + "\n"
@@ -42,13 +44,15 @@ class Block:
 
 
     def try_hash(self, nonce):
+        """
+        returne the hash value for a given nonce
+        """
         plain = ""
+        plain += str(self.blockNumber)
         plain += str(self.prev_hash)
         plain += str(self.timestamp)
         plain += str(self.merkle_root)
         plain += str(nonce)
-
-        #print(plain)
 
         h = hashlib.sha256()
         h.update(plain.encode())
@@ -56,17 +60,26 @@ class Block:
         return h.hexdigest()
 
 
-    def validate(self, nonce): # TODO : add signature ??????
+    def validate(self, nonce):
+        """
+        validate the block with a given nonce, computing the hash
+        """
         self.nonce = nonce
         self.hash = self.try_hash(nonce)
         return self.hash
 
 
     def get_hash(self):
+        """
+        return the hsash of the block
+        """
         return self.hash
 
 
     def compute_merkle_root(self):
+        """
+        compute the merkle root for the transactions of the block
+        """
         merkle_hashes = self.transactions.copy()
         merkle_hashes_length = len(merkle_hashes)
 
