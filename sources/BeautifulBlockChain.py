@@ -227,9 +227,10 @@ class BeautifulBlockChain:
         ------ How To Use ------
 
         To use one of this command call this python script following with one of this command, example :
-        ./BeautifulBlockChain.py -h
+        py sources/BBCMain.py -h
 
-        *** WARNING *** Don't forget to initialize the block chain by doing ./BeautifulBlockChain.py -i
+        *** WARNING *** Don't forget to initialize the blockchain by doing :
+        py sources/BBCMain.py -i
 
         ------ Commands ------
 
