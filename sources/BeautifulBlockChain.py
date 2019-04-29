@@ -2,8 +2,8 @@ import base64
 import os
 
 from Blockchain import Blockchain
-from User import User
 from DigitalCheck import *
+from User import User
 
 
 class BeautifulBlockChain:
@@ -16,9 +16,8 @@ class BeautifulBlockChain:
         self.extra = ""
         self.command_force = "--force"
         self.part_splitter = ";"
-        self.type_splitter = "!\n"
 
-    def command_manager(self, argument, extra):
+    def command_manager(self, argument, extra, displayTitle = True):
         """
         Manage all the command enter by the user
 
@@ -26,7 +25,10 @@ class BeautifulBlockChain:
         extra : for extra arguments, used in some command
         """
         self.extra = extra
-        print(self._display_title())
+
+        if displayTitle:
+            print(self._display_title())
+
         # Switcher is a dict with key = command, value = function to call
         switcher = {
             "-u": self._create_user,
@@ -50,15 +52,15 @@ class BeautifulBlockChain:
         # Create target Directory if don't exist
         if not os.path.exists(self.usersPath):
             os.makedirs(self.usersPath)
-            print("Directory ", self.usersPath, " Created ")
+            print("*** Directory ", self.usersPath, " Created ")
         else:
-            print("Directory '", self.usersPath, "' already exists")
+            print("*** Directory '", self.usersPath, "' already exists")
 
         if not os.path.exists(self.blockChainPath):
             os.makedirs(self.blockChainPath)
-            print("Directory ", self.blockChainPath, " Created ")
+            print("*** Directory ", self.blockChainPath, " Created ")
         else:
-            print("Directory ", self.blockChainPath, " already exists")
+            print("*** Directory ", self.blockChainPath, " already exists")
             
         blockchain = Blockchain()
 
@@ -143,10 +145,8 @@ class BeautifulBlockChain:
 
             # Prepare transaction
             data_transaction = str(sender.public_k_bytes()) + self.part_splitter + str(reciever.public_k_bytes()) + self.part_splitter + content + self.part_splitter + sender_sign_enc
-            #data_transaction = username1 + self.part_splitter + username2 + self.part_splitter + content + self.part_splitter + sender_sign_enc
 
             # Create transaction
-            #transaction = str(base64.b64encode(bytes(data_transaction, 'utf-8'))) + self.type_splitter + data_transaction
             transaction = data_transaction
             blockchain = Blockchain()
             blockchain.add_transaction(transaction)
@@ -156,28 +156,36 @@ class BeautifulBlockChain:
         Verify if a transaction encoded in base64 is valid.
         Check signature with given information in the transaction.
         """
-        transaction = self.extra
-        #transaction = transaction.split(self.type_splitter)[0]
-        #transaction = base64.b64decode(eval(transaction)).decode('utf-8')
-        transaction = transaction.split(self.part_splitter)
+        try:
+            transaction = self.extra
+            transaction = transaction.split(self.part_splitter)
 
-        content = bytes(transaction[2], 'utf-8')
-        sender_pu_k = import_key_bytes(eval(transaction[0]))
-        reciever_pu_k_bytes = eval(transaction[1])
-        signature = self._dec_sign_b64(transaction[3])
-        content_sign = content + reciever_pu_k_bytes
+            content = bytes(transaction[2], 'utf-8')
+            sender_pu_k = import_key_bytes(eval(transaction[0]))
+            reciever_pu_k_bytes = eval(transaction[1])
+            signature = self._dec_sign_b64(transaction[3])
+            content_sign = content + reciever_pu_k_bytes
 
-        h = generate_hash(content_sign)
+            h = generate_hash(content_sign)
 
-        if verify_signature(h, sender_pu_k, signature):
-            print("The signature is valid!")
-        else:
-            print("The signature is NOT valid!")
+            if verify_signature(h, sender_pu_k, signature):
+                print("*** The transaction is valid!")
+            else:
+                print("*** The transaction is NOT valid!")
+        except Exception as e:
+            print("*** The transaction is NOT valid!")
+            raise(e)
 
     def _enc_sign_b64(self, sign):
+        """
+        Encode a given string in a b64 string
+        """
         return str(base64.b64encode(sign))
 
     def _dec_sign_b64(self, enc_sign):
+        """
+        Decode a given b64 string in bytes
+        """
         return bytes(base64.b64decode(eval(enc_sign)))
 
     def _check_user_exists(self, username):
@@ -226,8 +234,8 @@ class BeautifulBlockChain:
         ------ Commands ------
 
         -h : display this page
-        -u : create a new user
         -i : initialize the base structure of the block chain (create usefull folders and files)
+        -u : create a new user
         -t : make a transaction between 2 user and add it to the blockchain when enough transactions were done
         -v : verify the transaction given in parameter (put the transaction between quotation marks)
         -d : display the blockchain

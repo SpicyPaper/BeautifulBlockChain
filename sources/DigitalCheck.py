@@ -32,6 +32,9 @@ def import_key(key_file_path):
         return RSA.import_key(keyfile.read())
 
 def import_key_bytes(key_bytes):
+    """
+    Import a key bytes in an RSA type
+    """
     return RSA.import_key(key_bytes)
 
 def verify_signature(h, public_key, signature):
