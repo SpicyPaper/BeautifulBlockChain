@@ -12,7 +12,7 @@ class Blockchain:
         print(self.blockchainPath)
 
         try:
-            self.load_blockchain()
+            self._load_blockchain()
         except Exception as e:
             genesis_block = Block(0, ["genesis block"])
             genesis_block.validate("no nonce")
@@ -87,7 +87,7 @@ class Blockchain:
         prev_hash = self.blocks[-1].get_hash()
         new_block = Block(prev_hash, self.transactions)
         new_block.validate("nonce" + str(new_block.blockNumber))
-        self.add_block(new_block)
+        self._add_block(new_block)
         self.transactions = []
 
 
